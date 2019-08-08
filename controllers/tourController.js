@@ -1,8 +1,31 @@
 const fs = require('fs');
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
-// ROUTE HANDLERS
+// checkID middlaware function
+exports.checkID = (req, res, next, val) => {
+    const tour = tours.find(tour => tour.id === parseInt(val));
 
+    if (!tour) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    next();
+};
+
+// checkBody middlaware function
+exports.checkBody = (req, res, next) => {
+    if (!req.body.name || !req.body.price) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Missing name or price'
+        });
+    }
+    next();
+};
+
+// ROUTE HANDLERS
 // getAllTours
 exports.getAllTours = (req, res) => {
     res.status(200).json({
@@ -36,13 +59,6 @@ exports.createTour = (req, res) => {
 exports.getTour = (req, res) => {
     const { id } = req.params;
     const tour = tours.find(tour => tour.id === parseInt(id));
-
-    if (!tour) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
     res.status(200).json({
         status: 'success',
         data: {
@@ -53,14 +69,8 @@ exports.getTour = (req, res) => {
 
 // updateTour
 exports.updateTour = (req, res) => {
-    const tour = tours.find(tour => tour.id === parseInt(req.params.id));
-
-    if (!tour) {
-        res.send(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
+    const { id } = req.params;
+    const tour = tours.find(tour => tour.id === parseInt(id));
     const newTour = { ...tour, ...req.body };
     const newTours = tours.map(tour => (tour.id === newTour.id ? newTour : tour));
 
@@ -82,12 +92,6 @@ exports.updateTour = (req, res) => {
 exports.deleteTour = (req, res) => {
     const { id } = req.params;
     const tour = tours.find(tour => tour.id === parseInt(id));
-    if (!tour) {
-        res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
 
     const newTours = tours.filter(tour => tour.id !== parseInt(id));
 
