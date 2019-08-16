@@ -6,7 +6,7 @@ exports.getAllTours = async (req, res) => {
         // BUILD QUERY
 
         // 1a) Filtering
-        const { page, sort, limit, fields, ...queryObj } = req.query;
+        let { page, sort, limit, fields, ...queryObj } = req.query;
 
         // 1b) Advanced filtering
         let queryStr = JSON.stringify(queryObj);
@@ -28,6 +28,18 @@ exports.getAllTours = async (req, res) => {
             query = query.select(selectedFields);
         } else {
             query = query.select('-__v');
+        }
+
+        // 4) Pagination
+        const pageInfo = req.query.page * 1 || 1;
+        const limitInfo = req.query.limit * 1 || 100;
+        const skip = (pageInfo - 1) * limitInfo;
+
+        query = query.skip(skip).limit(limitInfo);
+
+        if (req.query.page) {
+            const numTours = await Tour.countDocuments();
+            if (skip >= numTours) throw new Error('This page does not exist');
         }
 
         // EXECUTE QUERY
