@@ -15,6 +15,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 app.use(express.json());
 
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    console.log(req.headers);
+
+    next();
+});
+
 // Routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
