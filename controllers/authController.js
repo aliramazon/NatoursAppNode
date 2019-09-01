@@ -5,6 +5,7 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 
+// Checks if user is authenticated
 exports.isAuthenticated = catchAsync(async (req, res, next) => {
     // 1) Getting toke and  check if it exists
     let token;
@@ -35,6 +36,16 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
     next();
 });
 
+// Checks if user is authorized
+exports.isAuthorized = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new AppError('You are not authorized to perform this action', 403));
+        }
+        next();
+    };
+};
+
 // Create Token JWT
 const signToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -47,6 +58,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
+        role: req.body.role,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt
