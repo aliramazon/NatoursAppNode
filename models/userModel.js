@@ -48,8 +48,9 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date
 });
 
+// We run this function between we receive the data and persist the data into DB
 userSchema.pre('save', async function(next) {
-    // Only run this function if password was modified
+    // Only run this function if password was modified. It means, updating user's other fields should not hash the password
     if (!this.isModified('password')) return next();
 
     // Hash the password with cost 12
@@ -60,10 +61,21 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
+// Updates passwordChangedAt
+userSchema.pre('save', function(next) {
+    if (!this.isModified('password') || this.isNew) return next();
+    this.passwordChangedAt = Date.now() - 1000;
+    next();
+});
+
+// This functions checks if the submitted password is the same as the one saved in DB
+// We use bcrypt's compare method
 userSchema.methods.isPasswordCorrect = async function(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+// This function checks if user has changed the password after JWT was issued.
+// Imagine, someone has hacked your account and copied the JWT. You found out this and changed your password. Unfortunately, you and the guy stole your JWT can sign in. To Invalidate the stolen token, we need to make a user to sign in.
 userSchema.methods.isPasswordChangedAfter = function(JWTTimestamp) {
     if (this.passwordChangedAt) {
         const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
@@ -72,6 +84,7 @@ userSchema.methods.isPasswordChangedAfter = function(JWTTimestamp) {
     return false;
 };
 
+// Creates passwordResetToken using crypto.
 userSchema.methods.createPasswordResetToken = function() {
     const resetToken = crypto.randomBytes(32).toString('hex');
 
