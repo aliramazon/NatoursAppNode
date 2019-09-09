@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
 
+// const User = require('./userModel');
 const tourSchema = new mongoose.Schema(
     {
         name: {
@@ -100,6 +101,12 @@ const tourSchema = new mongoose.Schema(
                 description: String,
                 day: Number
             }
+        ],
+        guides: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User'
+            }
         ]
     },
     {
@@ -118,14 +125,11 @@ tourSchema.pre('save', function(next) {
     next();
 });
 
-// tourSchema.pre('save', function(next) {
-//     console.log('Will save document...');
-//     next();
-// });
+// It embeddes User document into tour document
+// tourSchema.pre('save', async function(next) {
+//     const guidesPromises = this.guides.map(async guideId => await User.findById(guideId));
 
-// tourSchema.post('save', function(doc, next) {
-//     console.log(doc);
-//     next();
+//     this.guides = await Promise.all(guidesPromises);
 // });
 
 // QUERY MIDDLEWARE
@@ -134,10 +138,13 @@ tourSchema.pre(/^find/, function(next) {
     next();
 });
 
-// tourSchema.post(/^find/, function(docs) {
-//     console.log(docs);
-//     next()
-// });
+tourSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordResetExpires -passwordResetToken -passwordChangedAt'
+    });
+    next();
+});
 
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function(next) {
