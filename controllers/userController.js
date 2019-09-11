@@ -57,6 +57,12 @@ exports.createUser = (req, res) => {
     });
 };
 
+// getMe
+exports.getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next();
+};
+
 // getUser
 exports.getUser = factory.getOne(User);
 
