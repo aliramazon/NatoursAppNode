@@ -10,18 +10,32 @@ router.use('/:tourId/reviews', reviewRouter);
 
 router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
 
-router.route('/tour-stats').get(tourController.getTourStats);
+router
+    .route('/tour-stats')
+    .get(
+        authController.isAuthenticated,
+        authController.isAuthorized('admin', 'super-guide', 'guide'),
+        tourController.getTourStats
+    );
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
     .route('/')
-    .get(authController.isAuthenticated, tourController.getAllTours)
-    .post(tourController.createTour);
+    .get(tourController.getAllTours)
+    .post(
+        authController.isAuthenticated,
+        authController.isAuthorized('admin', 'super-guide'),
+        tourController.createTour
+    );
 
 router
     .route('/:id')
     .get(tourController.getTour)
-    .patch(tourController.updateTour)
+    .patch(
+        authController.isAuthenticated,
+        authController.isAuthorized('admin', 'super-guide'),
+        tourController.updateTour
+    )
     .delete(
         authController.isAuthenticated,
         authController.isAuthorized('admin', 'super-guide'),

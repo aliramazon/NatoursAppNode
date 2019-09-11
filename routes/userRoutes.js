@@ -10,13 +10,16 @@ router.post('/signin', authController.signin);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch('/updateMyPassword', authController.isAuthenticated, authController.updatePassword);
+router.use(authController.isAuthenticated);
 
-router.get('/me', authController.isAuthenticated, userController.getMe, userController.getUser);
+router.patch('/updateMyPassword', authController.updatePassword);
 
-router.patch('/updateMe', authController.isAuthenticated, userController.updateMe);
-router.delete('/deleteMe', authController.isAuthenticated, userController.deleteMe);
+router.get('/me', userController.getMe, userController.getUser);
 
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
+
+router.use(authController.isAuthorized('admin'));
 router
     .route('/')
     .get(userController.getAllUsers)
