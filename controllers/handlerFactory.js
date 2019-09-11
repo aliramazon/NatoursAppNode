@@ -1,5 +1,6 @@
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+const APIFeatures = require('./../utils/apiFeatures');
 
 exports.deleteOne = Model =>
     catchAsync(async (req, res, next) => {
@@ -38,7 +39,37 @@ exports.createOne = Model =>
         res.status(201).json({
             status: 'success',
             data: {
-                tour: newDocument
+                data: newDocument
+            }
+        });
+    });
+
+exports.getOne = (Model, populateOptions) =>
+    catchAsync(async (req, res, next) => {
+        let query = Model.findById(req.params.id);
+        if (populateOptions) query = query.populate(populateOptions);
+        const document = await query;
+
+        if (!document) {
+            return next(new AppError('No document found with that ID', 404));
+        }
+        res.status(200).json({
+            status: 'success',
+            data: {
+                data: document
+            }
+        });
+    });
+
+exports.getAll = Model =>
+    catchAsync(async (req, res, next) => {
+        const documents = await Model.find();
+
+        res.status(200).json({
+            status: 'success',
+            results: documents.length,
+            data: {
+                data: documents
             }
         });
     });
