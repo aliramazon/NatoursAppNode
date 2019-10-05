@@ -240,3 +240,32 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
     createAndSendToken(currentUser, 200, res);
 });
+
+// isLoggedIn. Only for rendered pages, and there will no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+    // 1) Getting toke and  check if it exists
+
+    if (req.cookies.jwt) {
+        // 1) Verifies token
+        const decoded = await promisify(jwt.verify)(
+            req.cookies.jwt,
+            process.env.JWT_SECRET
+        );
+
+        // 2) Check if user still exists
+        const parsedUser = await User.findById(decoded.id);
+        if (!parsedUser) {
+            return next();
+        }
+
+        // 4) Check if user changed password after the token was issued
+        if (parsedUser.isPasswordChangedAfter(decoded.iat)) {
+            return next();
+        }
+
+        // 5) There is a logged in user
+        res.locals.user = parsedUser;
+        return next();
+    }
+    next();
+});

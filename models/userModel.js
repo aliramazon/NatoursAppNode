@@ -81,7 +81,10 @@ userSchema.pre(/^find/, function(next) {
 
 // This functions checks if the submitted password is the same as the one saved in DB
 // We use bcrypt's compare method
-userSchema.methods.isPasswordCorrect = async function(candidatePassword, userPassword) {
+userSchema.methods.isPasswordCorrect = async function(
+    candidatePassword,
+    userPassword
+) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
@@ -89,7 +92,10 @@ userSchema.methods.isPasswordCorrect = async function(candidatePassword, userPas
 // Imagine, someone has hacked your account and copied the JWT. You found out this and changed your password. Unfortunately, you and the guy stole your JWT can sign in. To Invalidate the stolen token, we need to make a user to sign in.
 userSchema.methods.isPasswordChangedAfter = function(JWTTimestamp) {
     if (this.passwordChangedAt) {
-        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+        const changedTimestamp = parseInt(
+            this.passwordChangedAt.getTime() / 1000,
+            10
+        );
         return changedTimestamp > JWTTimestamp;
     }
     return false;
