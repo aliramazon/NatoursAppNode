@@ -19,7 +19,9 @@ const signToken = id => {
 const createAndSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
     const cookieOptions = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
         secure: false,
         httpOnly: true
     };
@@ -76,11 +78,22 @@ exports.signin = catchAsync(async (req, res, next) => {
 exports.isAuthenticated = catchAsync(async (req, res, next) => {
     // 1) Getting toke and  check if it exists
     let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
         token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
     }
+
     if (!token) {
-        return next(new AppError('You are not logged in! Please, log in to get access', 401));
+        return next(
+            new AppError(
+                'You are not logged in! Please, log in to get access',
+                401
+            )
+        );
     }
 
     // 2) Validate token
@@ -94,7 +107,12 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
 
     // 4) Check if user changed password after the token was issued
     if (parsedUser.isPasswordChangedAfter(decoded.iat)) {
-        return next(new AppError('Password recently was changed. Please log in again', 401));
+        return next(
+            new AppError(
+                'Password recently was changed. Please log in again',
+                401
+            )
+        );
     }
 
     // 5) GRANT ACCESS TO PROTECTED ROUTE
@@ -106,7 +124,12 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
 exports.isAuthorized = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            return next(new AppError('You are not authorized to perform this action', 403));
+            return next(
+                new AppError(
+                    'You are not authorized to perform this action',
+                    403
+                )
+            );
         }
         next();
     };
@@ -117,7 +140,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     // 1) Get user based on posted email
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-        return next(new AppError('There is no user found with email address', 404));
+        return next(
+            new AppError('There is no user found with email address', 404)
+        );
     }
 
     // 2) Generate the random reset token
@@ -148,7 +173,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         user.passwordResetExpires = undefined;
         await user.save({ validateBeforeSave: false });
 
-        return next(new AppError('There was an error sending the email. Try again later', 500));
+        return next(
+            new AppError(
+                'There was an error sending the email. Try again later',
+                500
+            )
+        );
     }
 });
 
@@ -192,7 +222,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     const currentUser = await User.findById(req.user._id).select('+password');
 
     // 2) Check if the Posted password is correct
-    if (!(await currentUser.isPasswordCorrect(req.body.passwordCurrent, currentUser.password))) {
+    if (
+        !(await currentUser.isPasswordCorrect(
+            req.body.passwordCurrent,
+            currentUser.password
+        ))
+    ) {
         return next(new AppError('Your current password is wrong', 401));
     }
 
