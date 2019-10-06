@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import '@babel/polyfill';
-import { login } from './login';
+import { login, logout } from './login';
 import { displayMap } from './mapbox';
 import { displayAlert } from './alerts';
 
@@ -25,5 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mapBox) {
         const locations = JSON.parse(mapBox.dataset.locations);
         displayMap(locations);
+    }
+
+    // Logout
+    const logoutLink = document.querySelector('.nav__el--logout');
+
+    if (logoutLink) {
+        logoutLink.addEventListener('click', logout);
     }
 });
