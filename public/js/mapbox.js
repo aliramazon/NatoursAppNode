@@ -1,7 +1,6 @@
 /* eslint-disable */
-document.addEventListener('DOMContentLoaded', function() {
-    const locations = JSON.parse(document.getElementById('map').dataset.locations);
 
+export const displayMap = locations => {
     mapboxgl.accessToken =
         'pk.eyJ1IjoiYWxpcmFtYXpvbiIsImEiOiJjazE1eHExbDcwZjRhM2NzNTk1bjUzZW9hIn0.A0xgHwba0L1d6er7EBy9vA';
     var map = new mapboxgl.Map({
@@ -50,4 +49,4 @@ document.addEventListener('DOMContentLoaded', function() {
             right: 100
         }
     });
-});
+};
