@@ -4,7 +4,7 @@ import '@babel/polyfill';
 import { login, logout } from './login';
 import { displayMap } from './mapbox';
 import { displayAlert } from './alerts';
-import { updateData } from './updateSettings';
+import { updateDataSettings } from './updateSettings';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Logins user
@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutLink.addEventListener('click', logout);
     }
 
-    // updateData
-
+    // Update data
     const userDataForm = document.querySelector('.form-user-data');
 
     if (userDataForm) {
@@ -46,7 +45,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('email').value;
             const name = document.getElementById('name').value;
 
-            updateData(name, email);
+            updateDataSettings({ name, email }, 'data');
+        });
+    }
+
+    // Update password
+
+    const userPasswordForm = document.querySelector('.form-user-password');
+
+    if (userPasswordForm) {
+        userPasswordForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            document.querySelector('.btn--save-password').textContent =
+                'Updating...';
+
+            const passwordCurrent = document.getElementById('password-current')
+                .value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm')
+                .value;
+
+            await updateDataSettings(
+                { password, passwordConfirm, passwordCurrent },
+                'password'
+            );
+            document.querySelector('.btn--save-password').textContent =
+                'Update Password';
+
+            document.getElementById('password-current').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('password-confirm').value = '';
         });
     }
 });
