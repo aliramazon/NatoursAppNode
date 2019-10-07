@@ -83,7 +83,7 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
         req.headers.authorization.startsWith('Bearer')
     ) {
         token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies.jwt) {
+    } else if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
         token = req.cookies.jwt;
     }
 
@@ -117,6 +117,8 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
 
     // 5) GRANT ACCESS TO PROTECTED ROUTE
     req.user = parsedUser;
+    // 6) There is a logged in user
+    res.locals.user = parsedUser;
     next();
 });
 
