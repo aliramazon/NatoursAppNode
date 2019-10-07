@@ -42,6 +42,8 @@ exports.getAccount = (req, res) => {
     });
 };
 
+// Update user data without api
+
 exports.updateUserData = catchAsync(async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(
         req.user.id,

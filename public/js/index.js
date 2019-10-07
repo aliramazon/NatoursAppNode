@@ -4,6 +4,7 @@ import '@babel/polyfill';
 import { login, logout } from './login';
 import { displayMap } from './mapbox';
 import { displayAlert } from './alerts';
+import { updateData } from './updateSettings';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Logins user
@@ -32,5 +33,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (logoutLink) {
         logoutLink.addEventListener('click', logout);
+    }
+
+    // updateData
+
+    const userDataForm = document.querySelector('.form-user-data');
+
+    if (userDataForm) {
+        userDataForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+
+            updateData(name, email);
+        });
     }
 });
