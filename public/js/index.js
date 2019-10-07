@@ -7,7 +7,7 @@ import { displayAlert } from './alerts';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Logins user
-    const loginForm = document.querySelector('.form');
+    const loginForm = document.querySelector('.form--login');
 
     if (loginForm) {
         loginForm.addEventListener('submit', e => {
