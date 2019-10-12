@@ -8,7 +8,9 @@ const router = express.Router();
 // Use reviewRouter if /:tourId/review
 router.use('/:tourId/reviews', reviewRouter);
 
-router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
+router
+    .route('/top-5-cheap')
+    .get(tourController.aliasTopTours, tourController.getAllTours);
 
 router
     .route('/tour-stats')
@@ -40,6 +42,8 @@ router
     .patch(
         authController.isAuthenticated,
         authController.isAuthorized('admin', 'super-guide'),
+        tourController.uploadTourImages,
+        tourController.resizeTourImages,
         tourController.updateTour
     )
     .delete(
