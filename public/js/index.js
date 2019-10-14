@@ -5,6 +5,7 @@ import { login, logout } from './login';
 import { displayMap } from './mapbox';
 import { displayAlert } from './alerts';
 import { updateDataSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Logins user
@@ -76,6 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('password-current').value = '';
             document.getElementById('password').value = '';
             document.getElementById('password-confirm').value = '';
+        });
+    }
+
+    // Book Tour
+
+    const bookBtn = document.getElementById('book-tour');
+
+    if (bookBtn) {
+        bookBtn.addEventListener('click', e => {
+            e.target.textContent = 'Processing...';
+            const { tourId } = e.target.dataset;
+            bookTour(tourId);
         });
     }
 });
