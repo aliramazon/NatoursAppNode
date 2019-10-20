@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -23,10 +24,15 @@ const app = express();
 // Trust proxy. We need it for Heroku
 app.enable('trust proxy');
 
+// Views Settings
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // Middlewares
+
+// CORS
+app.use(cors());
+app.options('*', cors());
 
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
