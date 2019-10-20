@@ -20,6 +20,9 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+// Trust proxy. We need it for Heroku
+app.enable('trust proxy');
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
