@@ -78,5 +78,4 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
         title: 'My tours',
         tours
     });
-    next();
 });
