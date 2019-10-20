@@ -91,4 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bookTour(tourId);
         });
     }
+
+    const alertMessage = document.querySelector('body').dataset.alert;
+    if (alertMessage) displayAlert('success', alertMessage);
 });
